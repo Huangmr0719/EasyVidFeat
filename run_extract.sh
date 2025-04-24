@@ -1,10 +1,14 @@
-#extract features
-CUDA_VISIBLE_DEVICES=0 python visual_extract.py \
---csv /yout/preferred/csv/path.csv \
---model_path /your/model/path \
---extracted your_feature_name 
+# extract features
+CUDA_VISIBLE_DEVICES=0 python -m easy_video_extract extract \
+--video_root D:\videos \
+--feature_root D:\features \
+--feature_name clip_features \
+--model_path D:\models \
+--model_type clip \
+--model_name ViT-L/14
 
 # merge features
-python merge_features.py \
---folder your/features/file/path \
---output_path /your/feature/path.pth
+python -m easy_video_extract merge \
+--feature_root D:\features \
+--feature_name clip_features \
+--pad 100

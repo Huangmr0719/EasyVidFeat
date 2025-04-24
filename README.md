@@ -1,19 +1,18 @@
 # Easy Video Feature Extraction
 
-一个简单易用的视频特征提取工具，支持多种预训练模型，包括 CLIP 和 Hugging Face 模型。
+A simple and user-friendly tool for video feature extraction, supporting various pretrained models including CLIP and Hugging Face models.
 
-## 功能特点
+## Features
+- Support for multiple pretrained models (CLIP, Hugging Face)
+- Batch processing of video files
+-	Customizable image size and batch size
+-	Optional feature normalization
+-	Support for half-precision (FP16) output
+-	Automatic management of temporary files
 
-- 支持多种预训练模型（CLIP、Hugging Face）
-- 批量处理视频文件
-- 自定义图像尺寸和批处理大小
-- 支持特征归一化
-- 支持半精度（FP16）输出
-- 自动管理临时文件
+## Installation
 
-## 安装
-
-### 从源码安装
+### Install from source
 
 ```bash
 git clone https://github.com/yourusername/EasyVidFeat.git
@@ -21,23 +20,35 @@ cd EasyVidFeat
 pip install -e .
 ```
 
-## 使用方法
+## Usage
 
-### 1. 命令行使用
+### 1. Command-line Usage
 
-提取特征：
+Extract features:
+
 ```bash
-video-extract extract --csv videos.csv --model_type clip --model_name ViT-L/14
+video-extract extract \
+    --video_root your_video_path \
+    --feature_root your_feature_path \
+    --feature_name clip_features \
+    --model_type clip \
+    --model_name ViT-L/14
 ```
 
-合并特征：
+Merge features:
+
 ```bash
-video-extract merge --folder features_folder --output merged_features.pt --pad 100
+video-extract merge \
+    --feature_root your_feature_path \
+    --feature_name clip_features \
+    --pad 100
 ```
 
-完整参数说明：
+Full argument example:
+
 ```bash
-video-extract --csv videos.csv \
+video-extract --video_root your_video_path \
+
               --model_type clip \
               --model_name ViT-L/14 \
               --image_size 224 \
@@ -46,39 +57,53 @@ video-extract --csv videos.csv \
               --l2_normalize 0
 ```
 
-参数说明：
-- `--csv`: 包含视频路径和输出路径的CSV文件
-- `--model_type`: 模型类型，可选 'clip' 或 'huggingface'
-- `--model_name`: 模型名称
-- `--image_size`: 输入图像尺寸（默认224）
-- `--batch_size`: 批处理大小（默认32）
-- `--half_precision`: 是否使用半精度（默认1）
-- `--l2_normalize`: 是否进行L2归一化（默认0）
+### Parameters
+#### Extract Command
+-	`--video_root` : Root directory of videos
+-  `--feature_root` : Root directory to save features
+-  `--feature_name` : Feature Name
+-	`--model_type` : Model type, choose from 'clip' or 'huggingface'
+-	`--model_name` : Name of the model to use
+-	`--image_size` : Input image size (default: 224)
+-	`--batch_size` : Batch size for processing (default: 32)
+-  `--model_path` : Path to the model file (for offline models)
+-	`--half_precision` : Use half-precision (FP16) if set to 1 (default: 1)
+-	`--l2_normalize` : Apply L2 normalization to features if set to 1 (default: 0)
+-  `--framerate` : Video sampling framerate (default: 1)
+-  `--num_workers` : Number of data loading workers (default: 4)
+-  `--device` : Device to run on (default: cuda)
 
-### 2. Python API 使用
+#### Merge Command
+- `--feature_root`: Root directory of features
+- `--feature_name`: Name of feature directory
+- `--pad`: Padding/truncation length (default: 0)
 
-基本用法：
+### 2. Python API Usage
+
+#### Basic Usage
+
 ```python
 from easy_video_extract import VideoFeatureExtractor
 
-# 初始化提取器
+# Initialize the extractor
 extractor = VideoFeatureExtractor(
     model_type='clip',
     model_name='ViT-L/14'
 )
 
-# 提取特征
+# Extract features
 extractor.extract_from_csv('videos.csv')
 
-# 合并特征
+# Merge features
 extractor.merge_features(
     feature_folder='features_folder',
     output_path='merged_features.pt',
-    pad_length=100  # 可选，设置填充/截断长度
+    pad_length=100  # Optional: set padding/truncation length
 )
 ```
 
-高级用法：
+#### Advanced Usage
+
 ```python
 extractor = VideoFeatureExtractor(
     model_type='huggingface',
@@ -87,81 +112,93 @@ extractor = VideoFeatureExtractor(
     batch_size=16,
     half_precision=True,
     l2_normalize=True,
-    model_path='path/to/model'  # 可选，用于离线模型
+    model_path='path/to/model'  # Optional: for offline models
 )
 ```
 
-### 3. CSV文件格式
 
-CSV文件需要包含以下列：
-```csv
+### 3. CSV File Format
+
+The CSV file should contain the following columns:
+
+```bash
 video_path,feature_path
 /path/to/video1.mp4,/path/to/features/video1.npy
 /path/to/video2.mp4,/path/to/features/video2.npy
 ```
 
-## 支持的模型
+## Supported Models
 
-### CLIP 模型
-- ViT-B/32
-- ViT-B/16
-- ViT-L/14
-- ViT-L/14@336px
+**CLIP Models**
 
-### Hugging Face 模型
+-	ViT-B/32
+-	ViT-B/16
+-	ViT-L/14
+-	ViT-L/14@336px
+
+**Hugging Face Models**
+
 - BAAI/EVA-CLIP
 - openai/clip-vit-base-patch32
 - google/vit-base-patch16-224
-- 其他兼容的视觉模型
+- Other compatible vision models
 
-## 注意事项
 
-1. 内存使用：
-   - 批处理大小会影响内存使用
-   - 对于高分辨率视频，建议适当减小批处理大小
+## Notes
+### 1.	Memory Usage
 
-2. GPU 要求：
-   - 推荐使用 CUDA 支持的 NVIDIA GPU
-   - 至少 4GB 显存（推荐 8GB 以上）
+- Batch size directly impacts memory consumption
+- For high-resolution videos, consider reducing the batch size
+  
+### 2.	GPU Requirements
 
-3. 特征维度：
-   - CLIP ViT-L/14: 768维
-   - EVA-CLIP: 1024维
-   - 其他模型维度可能不同
+-	CUDA-compatible NVIDIA GPU recommended
+-	Minimum 4GB VRAM (8GB or more recommended)
+  
+### 3.	Feature Dimensions
 
-## 常见问题
+-	CLIP ViT-L/14: 768-dimensional
+-	EVA-CLIP: 1024-dimensional
+-	Other models may vary
 
-1. 内存不足：
-   ```python
-   # 减小批处理大小
-   extractor = VideoFeatureExtractor(batch_size=8)
-   ```
 
-2. 使用CPU：
-   ```python
-   # 将模型移至CPU（不推荐，会很慢）
-   extractor.model = extractor.model.cpu()
-   ```
+## FAQ
+### 1. Out of memory error
+ 
+```python
+# Reduce batch size
+extractor = VideoFeatureExtractor(batch_size=8)
+```
 
-3. 自定义预处理：
-   ```python
-   # 修改图像尺寸
-   extractor = VideoFeatureExtractor(image_size=336)
-   ```
+### 2.	Using CPU
 
-## 许可证
+```python
+# Move model to CPU (not recommended due to slower performance)
+extractor.model = extractor.model.cpu()
+```
+
+### 3.	Custom preprocessing
+
+```python
+# Change input image size
+extractor = VideoFeatureExtractor(image_size=336)
+```
+
+
+
+## License
 
 MIT License
 
-## 引用
+## Citation
 
-如果您在研究中使用了本工具，请引用：
+If you use this tool in your research, please cite it as:
 
-```bibtex
+```
 @software{easy_video_extract,
   title = {Easy Video Feature Extraction},
-  author = {Your Name},
-  year = {2024},
-  url = {https://github.com/yourusername/EasyVidFeat}
+  author = {Huangmr0719},
+  year = {2025},
+  url = {https://github.com/Huangmr0719/EasyVidFeat}
 }
 ```
