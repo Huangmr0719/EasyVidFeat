@@ -1,0 +1,20 @@
+feature_extraction:
+  video:
+    framerate: 1
+    size: 224
+    centercrop: true
+  
+  model:
+    name: "CLIP"  
+    clip_model: "ViT-L/14"
+    device: "cuda"
+    batch_size: 32
+    half_precision: true
+
+  output:
+    save_format: "npy"  # 可选: npy, pt
+    l2_normalize: true
+
+data:
+  num_workers: 4
+  prefetch_factor: 2
