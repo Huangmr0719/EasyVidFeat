@@ -15,7 +15,7 @@ A simple and user-friendly tool for video feature extraction, supporting various
 ### Install from source
 
 ```bash
-git clone https://github.com/yourusername/EasyVidFeat.git
+git clone https://github.com/Huangmr0719/EasyVidFeat.git
 cd EasyVidFeat
 pip install -e .
 ```
